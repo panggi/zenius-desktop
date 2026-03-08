@@ -8,14 +8,14 @@
     "start": "electron .",
     "start:no-sandbox": "electron . --no-sandbox",
     "version:print": "node -p \"require('./package.json').version\"",
-    "build:linux": "electron-builder --linux AppImage",
+    "build:linux": "electron-builder --linux AppImage --publish never",
     "build:binary": "npm run build:linux",
-    "build:mac": "electron-builder --mac dmg",
-    "build:win": "electron-builder --win nsis",
+    "build:mac": "electron-builder --mac dmg --publish never",
+    "build:win": "electron-builder --win nsis --publish never",
     "test": "node --test",
     "coverage": "c8 --all --include=src/**/*.js --check-coverage --lines 100 --functions 100 --branches 100 --statements 100 node --test",
-    "dist": "electron-builder",
-    "pack": "electron-builder --dir"
+    "dist": "electron-builder --publish never",
+    "pack": "electron-builder --dir --publish never"
   },
   "build": {
     "appId": "net.zenius.desktop",
