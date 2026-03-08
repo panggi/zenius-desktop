@@ -12,6 +12,13 @@ Zenius Desktop packages the Zenius web experience as a native desktop applicatio
 
 The app loads the live Zenius site inside Electron, uses the Zenius icon set, removes the default Electron menu bar, and keeps platform packaging in one repository.
 
+## Download
+
+Compiled binaries are published in GitHub Releases:
+
+- Latest release: https://github.com/panggi/zenius-desktop/releases/latest
+- All releases: https://github.com/panggi/zenius-desktop/releases
+
 ## Versioning
 
 The application version has a single source of truth:
@@ -150,6 +157,20 @@ It does the following:
 - runs tests and the coverage gate on Ubuntu
 - builds installers for GNU/Linux, macOS, and Windows
 - uploads the generated installers as workflow artifacts
+- publishes GNU/Linux, macOS, and Windows binaries to GitHub Releases on version tags
+
+Release publishing rules:
+
+- release assets are created only from GitHub Actions build outputs
+- the Git tag must match the app version in `package.json`
+- example: if `package.json` is `0.1.0`, the release tag must be `v0.1.0`
+
+Typical release flow:
+
+```bash
+git tag v$(npm run --silent version:print)
+git push origin main --tags
+```
 
 The workflow runs on:
 
