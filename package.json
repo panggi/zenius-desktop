@@ -1,7 +1,7 @@
 {
   "name": "zenius-desktop",
   "desktopName": "zenius-desktop.desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Desktop wrapper for https://www.zenius.net/",
   "main": "src/main.js",
   "scripts": {
@@ -47,6 +47,10 @@
     },
     "mac": {
       "icon": "assets/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
       "target": [
         "dmg"
       ]

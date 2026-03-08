@@ -99,8 +99,36 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Require Apple signing secrets for macOS release builds
+        if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          test -n "${{ secrets.CSC_LINK }}"
+          test -n "${{ secrets.CSC_KEY_PASSWORD }}"
+          test -n "${{ secrets.APPLE_API_KEY }}"
+          test -n "${{ secrets.APPLE_API_KEY_ID }}"
+          test -n "${{ secrets.APPLE_API_ISSUER }}"
+
+      - name: Write Apple API key
+        if: runner.os == 'macOS' && secrets.APPLE_API_KEY != ''
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8" <<'EOF'
+          ${{ secrets.APPLE_API_KEY }}
+          EOF
+
       - name: Build installer
-        run: npm run ${{ matrix.build_script }}
+        shell: bash
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY_PATH: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+        run: |
+          if [[ "${{ runner.os }}" == "macOS" && -n "${APPLE_API_KEY_ID}" && -n "${APPLE_API_ISSUER}" && -f "${APPLE_API_KEY_PATH}" ]]; then
+            export APPLE_API_KEY="${APPLE_API_KEY_PATH}"
+          fi
+          npm run ${{ matrix.build_script }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

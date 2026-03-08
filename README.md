@@ -159,11 +159,25 @@ It does the following:
 - uploads the generated installers as workflow artifacts
 - publishes GNU/Linux, macOS, and Windows binaries to GitHub Releases on version tags
 
+macOS signing and notarization:
+
+- release macOS builds are signed and notarized in GitHub Actions
+- signing/notarization is performed only in the GitHub Actions macOS job
+- tag builds fail if the required Apple secrets are missing
+
+Required GitHub Secrets:
+
+- `CSC_LINK`
+- `CSC_KEY_PASSWORD`
+- `APPLE_API_KEY`
+- `APPLE_API_KEY_ID`
+- `APPLE_API_ISSUER`
+
 Release publishing rules:
 
 - release assets are created only from GitHub Actions build outputs
 - the Git tag must match the app version in `package.json`
-- example: if `package.json` is `0.1.0`, the release tag must be `v0.1.0`
+- example: if `package.json` is `0.1.1`, the release tag must be `v0.1.1`
 
 Typical release flow:
 
