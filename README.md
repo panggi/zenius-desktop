@@ -19,6 +19,11 @@ Compiled binaries are published in GitHub Releases:
 - Latest release: https://github.com/panggi/zenius-desktop/releases/latest
 - All releases: https://github.com/panggi/zenius-desktop/releases
 
+Download note:
+
+- GNU/Linux and Windows releases are intended for normal download and install.
+- macOS releases are published from GitHub Actions too, but if Apple signing secrets are not configured yet, the macOS build is unsigned and may require manual Gatekeeper override such as right-click -> `Open`.
+
 ## Versioning
 
 The application version has a single source of truth:
@@ -161,11 +166,11 @@ It does the following:
 
 macOS signing and notarization:
 
-- release macOS builds are signed and notarized in GitHub Actions
-- signing/notarization is performed only in the GitHub Actions macOS job
-- tag builds fail if the required Apple secrets are missing
+- release macOS builds are always produced by the GitHub Actions macOS job
+- if Apple signing secrets are configured, the macOS build is signed and notarized
+- if Apple signing secrets are not configured, the macOS build is still published but is unsigned and may require manual override on the user's Mac
 
-Required GitHub Secrets:
+Optional GitHub Secrets for signed/notarized macOS releases:
 
 - `CSC_LINK`
 - `CSC_KEY_PASSWORD`

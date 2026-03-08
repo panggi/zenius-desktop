@@ -99,16 +99,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Require Apple signing secrets for macOS release builds
-        if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
-        run: |
-          test -n "${{ secrets.CSC_LINK }}"
-          test -n "${{ secrets.CSC_KEY_PASSWORD }}"
-          test -n "${{ secrets.APPLE_API_KEY }}"
-          test -n "${{ secrets.APPLE_API_KEY_ID }}"
-          test -n "${{ secrets.APPLE_API_ISSUER }}"
-
-      - name: Write Apple API key
+      - name: Write Apple API key when available
         if: runner.os == 'macOS' && secrets.APPLE_API_KEY != ''
         shell: bash
         run: |
