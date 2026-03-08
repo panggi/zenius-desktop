@@ -100,12 +100,15 @@ jobs:
         run: npm ci
 
       - name: Write Apple API key when available
-        if: runner.os == 'macOS' && secrets.APPLE_API_KEY != ''
+        if: runner.os == 'macOS'
         shell: bash
+        env:
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
         run: |
-          cat > "$RUNNER_TEMP/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8" <<'EOF'
-          ${{ secrets.APPLE_API_KEY }}
-          EOF
+          if [[ -n "${APPLE_API_KEY_CONTENT}" && -n "${APPLE_API_KEY_ID}" ]]; then
+            printf '%s\n' "${APPLE_API_KEY_CONTENT}" > "$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          fi
 
       - name: Build installer
         shell: bash
