@@ -113,14 +113,21 @@ jobs:
       - name: Build installer
         shell: bash
         env:
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          SIGNING_CSC_LINK: ${{ secrets.CSC_LINK }}
+          SIGNING_CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          NOTARY_APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          NOTARY_APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY_PATH: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
         run: |
-          if [[ "${{ runner.os }}" == "macOS" && -n "${APPLE_API_KEY_ID}" && -n "${APPLE_API_ISSUER}" && -f "${APPLE_API_KEY_PATH}" ]]; then
+          unset CSC_LINK CSC_KEY_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER
+          if [[ "${{ runner.os }}" == "macOS" && -n "${SIGNING_CSC_LINK}" && -n "${SIGNING_CSC_KEY_PASSWORD}" ]]; then
+            export CSC_LINK="${SIGNING_CSC_LINK}"
+            export CSC_KEY_PASSWORD="${SIGNING_CSC_KEY_PASSWORD}"
+          fi
+          if [[ "${{ runner.os }}" == "macOS" && -n "${NOTARY_APPLE_API_KEY_ID}" && -n "${NOTARY_APPLE_API_ISSUER}" && -f "${APPLE_API_KEY_PATH}" ]]; then
             export APPLE_API_KEY="${APPLE_API_KEY_PATH}"
+            export APPLE_API_KEY_ID="${NOTARY_APPLE_API_KEY_ID}"
+            export APPLE_API_ISSUER="${NOTARY_APPLE_API_ISSUER}"
           fi
           npm run ${{ matrix.build_script }}
 
