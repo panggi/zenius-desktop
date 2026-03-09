@@ -170,6 +170,25 @@ macOS signing and notarization:
 - if Apple signing secrets are configured, the macOS build is signed and notarized
 - if Apple signing secrets are not configured, the macOS build is still published but is unsigned and may require manual override on the user's Mac
 
+How to avoid Gatekeeper warnings for macOS releases:
+
+- do not ship unsigned macOS builds if you want normal double-click open behavior
+- enroll in the Apple Developer Program and create a `Developer ID Application` certificate
+- export that certificate as a `.p12` file and store it in GitHub as `CSC_LINK`
+- store the `.p12` password in GitHub as `CSC_KEY_PASSWORD`
+- create an App Store Connect API key and store it as `APPLE_API_KEY`, `APPLE_API_KEY_ID`, and `APPLE_API_ISSUER`
+- publish a new version tag after those secrets are configured so the GitHub Actions macOS job can sign and notarize the DMG
+
+What macOS users can do if the release is still unsigned:
+
+- move the app to `Applications`
+- try to open it once so Gatekeeper records the block
+- open `System Settings` -> `Privacy & Security`
+- click `Open Anyway` for `Zenius`
+- if macOS still blocks it, right-click the app and choose `Open`
+
+The proper fix is signing plus notarization. The `Open Anyway` flow is only a local override for users who trust the downloaded build.
+
 Optional GitHub Secrets for signed/notarized macOS releases:
 
 - `CSC_LINK`
