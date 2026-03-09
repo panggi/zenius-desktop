@@ -42,11 +42,20 @@ Build artifact names are generated from that same version through Electron Build
 
 - Node.js 20+
 - npm 10+
+- For the documented local build path, build AppImage on GNU/Linux, DMG on macOS, and NSIS on Windows.
 
 ## Install
 
+For day-to-day development:
+
 ```bash
 npm install
+```
+
+For clean, reproducible builds on CI or a fresh working tree:
+
+```bash
+npm ci
 ```
 
 ## Run locally
@@ -65,19 +74,31 @@ npm run start:no-sandbox
 
 ## Build
 
-Build all configured installers for the current platform:
+`electron-builder` builds the current host platform by default. This repository does not use one local command to produce GNU/Linux, macOS, and Windows installers from a single machine.
+
+Use these commands as the supported local build paths:
+
+- GNU/Linux host: `npm run build:linux`
+- macOS host: `npm run build:mac`
+- Windows host: `npm run build:win`
+
+If you need all release installers together, use the GitHub Actions workflow described below.
+
+Build the configured installer for the current host platform:
 
 ```bash
 npm run dist
 ```
 
-Build an unpacked directory for the current platform:
+Build an unpacked app directory for the current host platform:
 
 ```bash
 npm run pack
 ```
 
-Build a GNU/Linux AppImage:
+### GNU/Linux
+
+Build the AppImage on a GNU/Linux machine:
 
 ```bash
 npm run build:binary
@@ -89,28 +110,66 @@ or:
 npm run build:linux
 ```
 
-Build a macOS DMG:
+Expected output:
+
+```text
+dist/Zenius-<version>-linux-<arch>.AppImage
+```
+
+Example:
+
+```text
+dist/Zenius-0.1.1-linux-x86_64.AppImage
+```
+
+### macOS
+
+Build the DMG on a macOS machine:
 
 ```bash
 npm run build:mac
 ```
 
-Build a Windows NSIS installer:
+Expected output:
+
+```text
+dist/Zenius-<version>-mac-<arch>.dmg
+dist/mac-<arch>/Zenius.app
+dist/latest-mac.yml
+```
+
+Example on Apple Silicon:
+
+```text
+dist/Zenius-0.1.1-mac-arm64.dmg
+dist/mac-arm64/Zenius.app
+```
+
+macOS build behavior:
+
+- Local builds without Apple signing credentials are ad-hoc signed.
+- Ad-hoc signed builds can run locally after packaging, but Gatekeeper may reject them on another Mac until the user manually overrides it with right-click -> `Open`.
+- Signed and notarized macOS release builds require Apple credentials in CI.
+- The mac app bundle uses `build/entitlements.mac.plist` and `build/entitlements.mac.inherit.plist` during signing.
+
+### Windows
+
+Build the NSIS installer on Windows:
 
 ```bash
 npm run build:win
 ```
 
-Generated installer names follow this pattern:
+Expected output:
 
 ```text
-Zenius-<version>-<os>-<arch>.<ext>
+dist/Zenius-<version>-win-<arch>.exe
 ```
 
-Example for the current Linux build:
+Example:
 
 ```text
-dist/Zenius-<version>-linux-x86_64.AppImage
+dist/Zenius-0.1.1-win-x64.exe
 ```
 
 ## Test
@@ -160,15 +219,21 @@ It does the following:
 
 - reads the version from `package.json`
 - runs tests and the coverage gate on Ubuntu
-- builds installers for GNU/Linux, macOS, and Windows
+- builds GNU/Linux, macOS, and Windows installers on native runners
 - uploads the generated installers as workflow artifacts
 - publishes GNU/Linux, macOS, and Windows binaries to GitHub Releases on version tags
+
+Platform build matrix:
+
+- Ubuntu runner: `npm run build:linux` -> `dist/*.AppImage`
+- macOS runner: `npm run build:mac` -> `dist/*.dmg`
+- Windows runner: `npm run build:win` -> `dist/*.exe`
 
 macOS signing and notarization:
 
 - release macOS builds are always produced by the GitHub Actions macOS job
 - if Apple signing secrets are configured, the macOS build is signed and notarized
-- if Apple signing secrets are not configured, the macOS build is still published but is unsigned and may require manual override on the user's Mac
+- if Apple signing secrets are not configured, the macOS build is still published but is only ad-hoc signed and may require manual override on the user's Mac
 
 How to avoid Gatekeeper warnings for macOS releases:
 
@@ -233,4 +298,4 @@ The workflow runs on:
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](/home/panggi/Codes/Electron/Zenius/LICENSE).
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
